@@ -23,13 +23,13 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #747a7aff;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
         }
         button:hover {
-            background-color: #8a9191ff;
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -45,21 +45,32 @@
             const pixelSize = 22.5; // 1ピクセルのサイズ（10×10ピクセル）
             const gridSize = 8; // 8×8のグリッド
 
-           
+            // 灰色の16色パレット（黒を除く）
             const grayPalette = [
-                "#000000", "#747a7aff", "#8a9191ff", "#747a7aff",  "#747a7aff", "#464a4aff", "#5a5e5eff", "#747a7aff"
+                "#1c1c1c", "#383838", "#545454", "#707070", "#8c8c8c", "#a8a8a8", "#c4c4c4",
+                "#e0e0e0", "#cccccc", "#b8b8b8", "#a0a0a0", "#888888", "#6c6c6c", "#4c4c4c", "#2c2c2c", "#101010"
             ];
+
+            const black = "#000000"; // 黒色
 
             // キャンバスをクリア
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let y = 0; y < gridSize; y++) {
                 for (let x = 0; x < gridSize; x++) {
-                    // ランダムに灰色を選ぶ
-                    const randomColor = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                    let color;
+
+                    // 上から2行目の場合のみ黒を生成
+                    if (y === 1) {
+                        const isBlack = Math.random() < 0.5; // 50%の確率で黒
+                        color = isBlack ? black : grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                    } else {
+                        // それ以外は黒を除く灰色
+                        color = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                    }
 
                     // 色を塗る
-                    ctx.fillStyle = randomColor;
+                    ctx.fillStyle = color;
                     ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
                 }
             }
