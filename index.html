@@ -49,9 +49,10 @@
             let gridColors = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
 
             const grayPalette = [
-                "#747a7aff", "#8a9191ff", "#747a7aff",  "#747a7aff", "#464a4aff", "#5a5e5eff", "#747a7aff"
+                "#747a7aff", "#464a4aff", "#5a5e5eff", "#747a7aff"
             ];
-            const blackColor = "#000000";
+            const specialColor = "#8a9191ff"; // 特定の条件下でのみ生成
+            const blackColor = "#000000"; // 下から2行目で生成可能
 
             // キャンバスをクリア
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -61,13 +62,20 @@
                 for (let x = 0; x < gridSize; x++) {
                     if (gridColors[y][x] === null) {
                         let randomColor;
-                        if (y >= gridSize - 2) {
-                            // 下から2行目以降は黒を含めたパレットからランダム
+
+                        if (y === gridSize - 2) {
+                            // 下から2行目は黒を含めたパレットからランダム
                             const extendedPalette = [...grayPalette, blackColor];
                             randomColor = extendedPalette[Math.floor(Math.random() * extendedPalette.length)];
-                        } else {
-                            // それ以外は灰色のパレットからランダム
+                        } else if (
+                            y === 2 && (x >= 1 && x <= 4)
+                        ) {
+                            // 上から3行目かつ左から2番目から5番目の範囲では specialColor を除外
                             randomColor = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                        } else {
+                            // その他の行では specialColor を含めたパレットからランダム
+                            const extendedPalette = [...grayPalette, specialColor];
+                            randomColor = extendedPalette[Math.floor(Math.random() * extendedPalette.length)];
                         }
 
                         // 色を塗る
@@ -89,13 +97,17 @@
 
                 if (gridColors[y][x] === null) {
                     let randomColor;
-                    if (y >= gridSize - 2) {
-                        // 下から2行目以降は黒を含めたパレットからランダム
+
+                    if (y === gridSize - 2) {
                         const extendedPalette = [...grayPalette, blackColor];
                         randomColor = extendedPalette[Math.floor(Math.random() * extendedPalette.length)];
-                    } else {
-                        // それ以外は灰色のパレットからランダム
+                    } else if (
+                        y === 2 && (x >= 1 && x <= 4)
+                    ) {
                         randomColor = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                    } else {
+                        const extendedPalette = [...grayPalette, specialColor];
+                        randomColor = extendedPalette[Math.floor(Math.random() * extendedPalette.length)];
                     }
 
                     // 色を確定
