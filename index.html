@@ -23,13 +23,13 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #4CAF50;
+            background-color: #747a7aff;
             color: white;
             border: none;
             border-radius: 5px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #8a9191ff;
         }
     </style>
 </head>
@@ -45,35 +45,67 @@
             const pixelSize = 22.5; // 1ピクセルのサイズ（10×10ピクセル）
             const gridSize = 8; // 8×8のグリッド
 
-            // 灰色の16色パレット（黒を除く）
-            const grayPalette = [
-                "#1c1c1c", "#383838", "#545454", "#707070", "#8c8c8c", "#a8a8a8", "#c4c4c4",
-                "#e0e0e0", "#cccccc", "#b8b8b8", "#a0a0a0", "#888888", "#6c6c6c", "#4c4c4c", "#2c2c2c", "#101010"
-            ];
+            // ドットの色を保持する2D配列（nullは未確定）
+            let gridColors = Array.from({ length: gridSize }, () => Array(gridSize).fill(null));
 
-            const black = "#000000"; // 黒色
+            const grayPalette = [
+                "#747a7aff", "#8a9191ff", "#747a7aff",  "#747a7aff", "#464a4aff", "#5a5e5eff", "#747a7aff"
+            ];
+            const blackColor = "#000000";
 
             // キャンバスをクリア
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // ドット絵を生成
             for (let y = 0; y < gridSize; y++) {
                 for (let x = 0; x < gridSize; x++) {
-                    let color;
+                    if (gridColors[y][x] === null) {
+                        let randomColor;
+                        if (y >= gridSize - 2) {
+                            // 下から2行目以降は黒を含めたパレットからランダム
+                            const extendedPalette = [...grayPalette, blackColor];
+                            randomColor = extendedPalette[Math.floor(Math.random() * extendedPalette.length)];
+                        } else {
+                            // それ以外は灰色のパレットからランダム
+                            randomColor = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                        }
 
-                    // 上から2行目の場合のみ黒を生成
-                    if (y === 1) {
-                        const isBlack = Math.random() < 0.5; // 50%の確率で黒
-                        color = isBlack ? black : grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                        // 色を塗る
+                        ctx.fillStyle = randomColor;
+                        ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
                     } else {
-                        // それ以外は黒を除く灰色
-                        color = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                        // 色が確定した場所にはその色を塗る
+                        ctx.fillStyle = gridColors[y][x];
+                        ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
                     }
-
-                    // 色を塗る
-                    ctx.fillStyle = color;
-                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
                 }
             }
+
+            // クリックイベントを追加して確定機能を実装
+            canvas.addEventListener('click', (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = Math.floor((event.clientX - rect.left) / pixelSize);
+                const y = Math.floor((event.clientY - rect.top) / pixelSize);
+
+                if (gridColors[y][x] === null) {
+                    let randomColor;
+                    if (y >= gridSize - 2) {
+                        // 下から2行目以降は黒を含めたパレットからランダム
+                        const extendedPalette = [...grayPalette, blackColor];
+                        randomColor = extendedPalette[Math.floor(Math.random() * extendedPalette.length)];
+                    } else {
+                        // それ以外は灰色のパレットからランダム
+                        randomColor = grayPalette[Math.floor(Math.random() * grayPalette.length)];
+                    }
+
+                    // 色を確定
+                    gridColors[y][x] = randomColor;
+
+                    // クリックした位置に色を塗る
+                    ctx.fillStyle = randomColor;
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            });
         }
 
         // 初回ロード時に生成
